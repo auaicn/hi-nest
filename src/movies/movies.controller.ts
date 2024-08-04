@@ -1,62 +1,62 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
   Query,
 } from '@nestjs/common';
+import { MoviesService } from './movies.service';
+import { Movie } from './entities/movie.entity';
 
 @Controller('movies')
 export class MoviesController {
-  movies: {
-    id: number;
-    name: string;
-  }[] = [
-    {
-      id: 1,
-      name: 'one',
-    },
-  ];
+  constructor(readonly moviesService: MoviesService) {
+    console.log('MoviesController created');
+  }
 
   @Get()
-  getAll() {
-    return this.movies;
+  getAll(): Movie[] {
+    return this.moviesService.getAll();
   }
 
-  @Get('search')
-  search(@Query('year') searchingYear: string) {
-    return `We are searching for a movie made after: ${searchingYear}`;
-  }
+  //   @Get('search')
+  //   search(@Query('year') searchingYear: string) {
+  //     return `We are searching for a movie made after: ${searchingYear}`;
+  //   }
 
   @Get(':id')
-  getOne(@Param('id') movieId: number) {
-    return `This will return one movie ${movieId} `;
+  getOne(@Param('id') movieId: string): Movie {
+    return this.moviesService.getOne(movieId);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') movieId: string) {
+    return this.moviesService.deleteOne(movieId);
   }
 
   @Post()
-  create(@Body() movie) {
-    this.movies.push(movie);
-
-    return movie;
+  create(@Body() createData) {
+    return this.moviesService.createOne(createData);
   }
 
-  @Patch(':id')
-  path(@Param('id') movieId: string, @Body() updateData) {
-    this.movies = this.movies.map((movie) => {
-      if (movie.id === +movieId) {
-        return {
-          ...movie,
-          ...updateData,
-        };
-      }
+  //   @Patch(':id')
+  //   path(@Param('id') movieId: string, @Body() updateData) {
+  //     this.movies = this.movies.map((movie) => {
+  //       if (movie.id === +movieId) {
+  //         return {
+  //           ...movie,
+  //           ...updateData,
+  //         };
+  //       }
 
-      return movie;
-    });
+  //       return movie;
+  //     });
 
-    return this.movies;
-  }
+  //     return this.movies;
+  //   }
 
   //   @Delete(':id')
   //   remove(@Param('id') movieId: number) {
